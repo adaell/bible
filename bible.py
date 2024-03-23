@@ -7,8 +7,8 @@ DEFAULT_TRANSLATION = 'LEB'
 OUTPUT_WIDTH=80 # Width of console output
 
 
-BIBLEBOOKS=['Genesis','Exodus','Leviticus','Numbers','Deuteronomy','Joshua','Judges','Ruth','1Samuel','2Samuel','1Kings','2Kings','1Chronicles','2Chronicles','Ezra','Nehemiah','Esther','Job','Psalms','Proverbs','Ecclesiastes','SongOfSolomon','Isaiah','Jeremiah','Lamentations','Ezekiel','Daniel','Hosea','Joel','Amos','Obadiah','Jonah','Micah','Nahum','Habakkuk','Zephaniah','Haggai','Zechariah','Malachi','Tobit','Judith','WisdomOfSolomon','Sirach','Baruch','LetterOfJeremiah','Susanna','BelAndTheDragon','1Maccabees','2Maccabees','1Esdras','3Maccabees','2Esdras','4Maccabees','Psalms','Matthew','Mark','Luke','John','Acts','Romans','1Corinthians','2Corinthians','Galatians','Ephesians','Philippians','Colossians','1Thessalonians','2Thessalonians','1Timothy','2Timothy','Titus','Philemon','Hebrews','James','1 Peter','2 Peter','1John','2John','3John','Jude','Revelation']
-BIBLEBOOKS_ABV=['Gen','Exod','Lev','Num','Deut','Josh','Judg','Rth','1 Sam','2 Sam','1 Kgs','2 Kgs','1 Chron','2 Chron','Ezr','Neh','Esth','Jb','Ps','Prov','Ecc','Song','Isa','Jer','Lam','Ezek','Dan','Hos','Joe','Am','Obad','Jnh','Micah','Nah','Hab','Zeph','Hag','Zech','Mal','Tobit','Jdth','Wisd','Sir','Bar','Letter','Sus','Bel','1 Macc','2 Macc','1 Esdr','3 Macc','2 Esdr','4 Macc','Ps','Laod','Matt','Mrk','Luk','John','Act','Rom','1 Cor','2 Cor','Gal','Ephes','Phil','Col','1 Thess','2 Thess','1 Tim','2 Tim','Titus','Philem','Heb','James','1 Pet','2 Pet','1 John','2 John','3 John','Jude','Rev']
+BIBLEBOOKS=['Genesis','Exodus','Leviticus','Numbers','Deuteronomy','Joshua','Judges','Ruth','1Samuel','2Samuel','1Kings','2Kings','1Chronicles','2Chronicles','Ezra','Nehemiah','Esther','Job','Psalms','Proverbs','Ecclesiastes','SongOfSolomon','Isaiah','Jeremiah','Lamentations','Ezekiel','Daniel','Hosea','Joel','Amos','Obadiah','Jonah','Micah','Nahum','Habakkuk','Zephaniah','Haggai','Zechariah','Malachi','Tobit','Judith','WisdomOfSolomon','Sirach','Baruch','LetterOfJeremiah','Susanna','BelAndTheDragon','1Maccabees','2Maccabees','1Esdras','3Maccabees','2Esdras','4Maccabees','Psalms','Matthew','Mark','Luke','John','Acts','Romans','1Corinthians','2Corinthians','Galatians','Ephesians','Philippians','Colossians','1Thessalonians','2Thessalonians','1Timothy','2Timothy','Titus','Philemon','Hebrews','James','1Peter','2Peter','1John','2John','3John','Jude','Revelation']
+BIBLEBOOKS_ABV=['Gen','Exod','Lev','Num','Deut','Josh','Judg','Rth','1Sam','2Sam','1Kgs','2Kgs','1Chron','2Chron','Ezr','Neh','Esth','Jb','Ps','Prov','Ecc','Song','Isa','Jer','Lam','Ezek','Dan','Hos','Joe','Am','Obad','Jnh','Micah','Nah','Hab','Zeph','Hag','Zech','Mal','Tobit','Jdth','Wisd','Sir','Bar','Letter','Sus','Bel','1Macc','2Macc','1Esdr','3Macc','2Esdr','4Macc','Ps','Laod','Matt','Mrk','Luk','John','Act','Rom','1Cor','2Cor','Gal','Ephes','Phil','Col','1Thess','2Thess','1Tim','2Tim','Titus','Philem','Heb','James','1Pet','2Pet','1John','2John','3John','Jude','Rev']
 TRANSLATION_LIST=['KJ21','ASV','AMP','AMPC','BRG','CSB','CEB','CJB','CEV','DARBY','DLNT','DRA','ERV','EASY','EHV','ESV','ESVUK','EXB','GNV','GW','GNT','HCSB','ICB','ISV','PHILLIPS','JUB','KJV','AKJV','LSB','LEB','TLB','MSG','MEV','MOUNCE','NOG','NABRE','NASB','NASB1995','NCB','NCV','NET Bible','NIRV','NIV','NIVUK','NKJV','NLV','NLT','NMB','NRSVA','NRSVACE','NRSVCE','NRSVUE','NTFE','OJB','RGT','RSV','RSVCE','TLV','VOICE','WEB','WE','WYC','YLT']
 
 # a class for storing bible verse information
@@ -203,32 +203,7 @@ def parse_footnotes(footnotes):
 		consoleout += '\n'
 	print_to_console(consoleout)
 
-# parses a list of strings and adds newline characters after chapter titles
-# def addChapterNewlines(string):
-# 	for i in range(len(string)-1):
-# 		line0 = string[i]
-# 		line1 = string[i+1]
-# 		if ('\xa0' in line1) and (line0 != ' '):
-# 			if line1.count('\xa0') == 1:
-# 				if i == 1: # Special case
-# 					string[i] = '\n' + line0 + '\n\n'
-# 				else:
-# 					string[i] = '\n\n' + line0 + '\n\n'
-# 			if line1.count('\xa0') > 1:
-# 				string[i] = '\xa0'
-# 	return string
-
-# # reformats the text to ensure that footnotes are properly spaced
-# def fixFootnoteSpacing(string):
-# 	for i in range(len(string)-1):
-# 		line0 = string[i]
-# 		line1 = string[i+1]
-# 		if ('[' in line1) and (line0 != ' '): # add spacing before footnote
-# 			string[i] = line0 + ' '
-# 		if line0 == '  ': # change double space to one space
-# 			string[i] = ' '
-# 	return string
-
+# makes some cosmetic changes to the html string 
 def fixFormating(string):
 	import re
 	for i in range(len(string)-1):
@@ -281,7 +256,7 @@ def parseAndPrintHtml(string):
 				parse_verse(data)
 				break
 	if startPrinting is False:
-		print("\nI could not locate this verse.")
+		print("\nI could not locate this verse.\n")
 		sys.exit(1)
 
 # parses the html footnote string and prints the footnotes to console
