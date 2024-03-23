@@ -6,6 +6,9 @@ import sys
 TRANSLATION = 'NASB'
 OUTPUT_WIDTH=80 
 
+BIBLEBOOKS=['Genesis','Exodus','Leviticus','Numbers','Deuteronomy','Joshua','Judges','Ruth','1 Samuel','2 Samuel','1 Kings','2 Kings','1 Chronicles','2 Chronicles','Ezra','Nehemiah','Esther','Job','Psalms','Proverbs','Ecclesiastes','Song of Solomon','Isaiah','Jeremiah','Lamentations','Ezekiel','Daniel','Hosea','Joel','Amos','Obadiah','Jonah','Micah','Nahum','Habakkuk','Zephaniah','Haggai','Zechariah','Malachi','Tobit','Judith','Wisdom Of Solomon','Sirach','Baruch','Letter of Jeremish','Susanna','Bel and the Dragon','1 Maccabees','2 Maccabees','1 Esdras','3 Maccabees','2 Esdras','4 Maccabees','Psalms','Matthew','Mark','Luke','John','Acts','Romans','1 Corinthians','2 Corinthians','Galatians','Ephesians','Philippians','Colossians','1 Thessalonians','2 Thessalonians','1 Timothy','2 Timothy','Titus','Philemon','Hebrews','James','1 Peter','2 Peter','1 John','2 John','3 John','Jude','Revelation']
+BIBLEBOOKS_ABV=['Gen','Exod','Lev','Num','Deut','Josh','Judg','Rth','1 Sam','2 Sam','1 Kgs','2 Kgs','1 Chron','2 Chron','Ezr','Neh','Esth','Jb','Ps','Prov','Ecc','Song','Isa','Jer','Lam','Ezek','Dan','Hos','Joe','Am','Obad','Jnh','Micah','Nah','Hab','Zeph','Hag','Zech','Mal','Tobit','Jdth','Wisd','Sir','Bar','Letter','Sus','Bel','1 Macc','2 Macc','1 Esdr','3 Macc','2 Esdr','4 Macc','Ps','Laod','Matt','Mrk','Luk','John','Act','Rom','1 Cor','2 Cor','Gal','Ephes','Phil','Col','1 Thess','2 Thess','1 Tim','2 Tim','Titus','Philem','Heb','James','1 Pet','2 Pet','1 John','2 John','3 John','Jude','Rev']
+
 # a class for storing bible verse information
 class bibleverse:
 	def __init__(self):
@@ -23,17 +26,46 @@ def parseInput():
 		print("Invalid number of arguments. Was expecting two (Chapter Verse). Try `bible Genesis 2:3-4`")
 		exit(1)
 
-	# TODO
-
 	verse = bibleverse()
-	verse.book = "Genesis"
-	verse.chapter = 1
-	verse.verse = [2,3]
+	for i in range(1,len(sys.argv)):
+		arg = sys.argv[i]
+		if arg in BIBLEBOOKS:
+			verse.book = arg
+			continue
+		if arg in BIBLEBOOKS_ABV:
+			verse_index = BIBLEBOOKS_ABV.index(arg)
+			verse.book = BIBLEBOOKS[verse_index]
+			continue
+		if ':' in arg:
+			chap_verse_info = arg.split(":")
+			verse.chapter = int(chap_verse_info[0])
+			if '-' in chap_verse_info[1]:
+				vnums = chap_verse_info[1].split('-')
+				verse.verse = [int(vnums[0]),int(vnums[1])]
+			else:
+				verse.verse = int(vnums)
+			continue
+
+	sanity_check(verse)
 	return verse
+
+def sanity_check(bibleverse):
+	if bibleverse.chapter == None:
+		print("Did not understand what chapter")
+		sys.exit(1)
+	if bibleverse.book == None:
+		print("Did not understand which book")
+		sys.exit(1)
+	if len(bibleverse.verse) > 1:
+		if(bibleverse.verse[0] > bibleverse.verse[1]):
+			print("The first verse is larger than the second")
+			sys.exit(1)
 
 # Takes a bibleverse and returns a url to the verse on biblegateway
 def generateUrl(bibleverse):
-	if(len(bibleverse.verse) == 1):
+	if(bibleverse.verse == [None,None]):
+		chap = str(bibleverse.chapter)
+	elif(len(bibleverse.verse) == 1):
 		chap = str(bibleverse.chapter) + "%3A" + str(bibleverse.verse[0])
 	else:
 		chap = str(bibleverse.chapter) + "%3A" + str(bibleverse.verse[0]) + '-' + str(bibleverse.verse[1])
@@ -100,7 +132,6 @@ def print_to_console(string):
 			if c == " ":
 				newstring+='\n'
 				counter = 0
-	# newstring += '\n'
 	print(newstring)
 
 # cleans up a the verse and prints to console
