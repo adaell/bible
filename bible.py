@@ -2,11 +2,12 @@
 import urllib.request
 import sys
 
-# Width of console output
+# 
 DEFAULT_TRANSLATION = 'LEB'
-OUTPUT_WIDTH=80 
+OUTPUT_WIDTH=80 # Width of console output
 
-BIBLEBOOKS=['Genesis','Exodus','Leviticus','Numbers','Deuteronomy','Joshua','Judges','Ruth','1 Samuel','2 Samuel','1 Kings','2 Kings','1 Chronicles','2 Chronicles','Ezra','Nehemiah','Esther','Job','Psalms','Proverbs','Ecclesiastes','Song of Solomon','Isaiah','Jeremiah','Lamentations','Ezekiel','Daniel','Hosea','Joel','Amos','Obadiah','Jonah','Micah','Nahum','Habakkuk','Zephaniah','Haggai','Zechariah','Malachi','Tobit','Judith','Wisdom Of Solomon','Sirach','Baruch','Letter of Jeremish','Susanna','Bel and the Dragon','1 Maccabees','2 Maccabees','1 Esdras','3 Maccabees','2 Esdras','4 Maccabees','Psalms','Matthew','Mark','Luke','John','Acts','Romans','1 Corinthians','2 Corinthians','Galatians','Ephesians','Philippians','Colossians','1 Thessalonians','2 Thessalonians','1 Timothy','2 Timothy','Titus','Philemon','Hebrews','James','1 Peter','2 Peter','1 John','2 John','3 John','Jude','Revelation']
+
+BIBLEBOOKS=['Genesis','Exodus','Leviticus','Numbers','Deuteronomy','Joshua','Judges','Ruth','1Samuel','2Samuel','1Kings','2Kings','1Chronicles','2Chronicles','Ezra','Nehemiah','Esther','Job','Psalms','Proverbs','Ecclesiastes','SongOfSolomon','Isaiah','Jeremiah','Lamentations','Ezekiel','Daniel','Hosea','Joel','Amos','Obadiah','Jonah','Micah','Nahum','Habakkuk','Zephaniah','Haggai','Zechariah','Malachi','Tobit','Judith','WisdomOfSolomon','Sirach','Baruch','LetterOfJeremiah','Susanna','BelAndTheDragon','1Maccabees','2Maccabees','1Esdras','3Maccabees','2Esdras','4Maccabees','Psalms','Matthew','Mark','Luke','John','Acts','Romans','1Corinthians','2Corinthians','Galatians','Ephesians','Philippians','Colossians','1Thessalonians','2Thessalonians','1Timothy','2Timothy','Titus','Philemon','Hebrews','James','1 Peter','2 Peter','1John','2John','3John','Jude','Revelation']
 BIBLEBOOKS_ABV=['Gen','Exod','Lev','Num','Deut','Josh','Judg','Rth','1 Sam','2 Sam','1 Kgs','2 Kgs','1 Chron','2 Chron','Ezr','Neh','Esth','Jb','Ps','Prov','Ecc','Song','Isa','Jer','Lam','Ezek','Dan','Hos','Joe','Am','Obad','Jnh','Micah','Nah','Hab','Zeph','Hag','Zech','Mal','Tobit','Jdth','Wisd','Sir','Bar','Letter','Sus','Bel','1 Macc','2 Macc','1 Esdr','3 Macc','2 Esdr','4 Macc','Ps','Laod','Matt','Mrk','Luk','John','Act','Rom','1 Cor','2 Cor','Gal','Ephes','Phil','Col','1 Thess','2 Thess','1 Tim','2 Tim','Titus','Philem','Heb','James','1 Pet','2 Pet','1 John','2 John','3 John','Jude','Rev']
 TRANSLATION_LIST=['KJ21','ASV','AMP','AMPC','BRG','CSB','CEB','CJB','CEV','DARBY','DLNT','DRA','ERV','EASY','EHV','ESV','ESVUK','EXB','GNV','GW','GNT','HCSB','ICB','ISV','PHILLIPS','JUB','KJV','AKJV','LSB','LEB','TLB','MSG','MEV','MOUNCE','NOG','NABRE','NASB','NASB1995','NCB','NCV','NET Bible','NIRV','NIV','NIVUK','NKJV','NLV','NLT','NMB','NRSVA','NRSVACE','NRSVCE','NRSVUE','NTFE','OJB','RGT','RSV','RSVCE','TLV','VOICE','WEB','WE','WYC','YLT']
 
@@ -26,14 +27,16 @@ def parseInput():
 	# if len(sys.argv) > 3:
 	# 	print("Invalid number of arguments. Was expecting two (Chapter Verse). Try `bible Genesis 2:3-4`")
 	# 	exit(1)
+	lBIBLEBOOKS = [x.lower() for x in BIBLEBOOKS]
+	lBIBLEBOOKS_ABV = [x.lower() for x in BIBLEBOOKS_ABV]
 
 	verse = bibleverse()
 	for i in range(1,len(sys.argv)):
 		arg = sys.argv[i]
-		if arg in BIBLEBOOKS:
-			verse.book = arg
+		if arg.lower() in lBIBLEBOOKS:
+			verse.book = BIBLEBOOKS[lBIBLEBOOKS.index(arg.lower())]
 			continue
-		if arg in BIBLEBOOKS_ABV:
+		if arg.lower() in lBIBLEBOOKS_ABV:
 			verse_index = BIBLEBOOKS_ABV.index(arg)
 			verse.book = BIBLEBOOKS[verse_index]
 			continue
@@ -63,11 +66,11 @@ def parseInput():
 
 def sanity_check(bibleverse):
 	if bibleverse.chapter == None:
-		print("Did not understand what chapter")
+		print("I do not understand what chapter you want.")
 		sys.exit(1)
 	if bibleverse.book == None:
-		print("Did not understand which book")
-		sys.exit(1)	
+		print("I do not understand which book you want")
+		sys.exit(1)
 
 # Takes a bibleverse and returns a url to the verse on biblegateway
 def generateUrl(bibleverse):
@@ -80,7 +83,7 @@ def generateUrl(bibleverse):
 	string = "https://www.biblegateway.com/passage/?search=" + bibleverse.book + "+" + chap + "&version=" + bibleverse.translation
 	return string
 
-# Fetches a url and returns a html string
+# Fetches a url and returns a string with the html text
 def fetchUrl(url_string):
 	import urllib.request
 	with urllib.request.urlopen(url_string) as response:
@@ -126,7 +129,7 @@ def print_title(bibleverse):
 		string = '\n' + bibleverse.book + " " + str(bibleverse.chapter) + ":" + str(bibleverse.verse)
 	print(string)
 
-# adds carriage returns to the string
+# adds carriage returns to string every OUTPUT_WIDTH characters
 def print_to_console(string):
 	counter = 0
 	newstring = '\n'
@@ -141,7 +144,7 @@ def print_to_console(string):
 				counter = 0
 	print(newstring)
 
-# cleans up a the verse and prints to console
+# cleans up a list of strings with html markers and prints to console
 def parse_verse(htmllist):
 	consoleout = ''
 	skip = 0 # number of entries to skip
@@ -160,7 +163,7 @@ def parse_verse(htmllist):
 		consoleout += string
 	print_to_console(consoleout)
 
-# cleans up a the footnotes and prints them to console
+# cleans up a string with footnotes information and prints them to console
 def parse_footnotes(footnotes):
 	consoleout = ''
 	# loop over footnotes
@@ -183,8 +186,7 @@ def parse_footnotes(footnotes):
 		consoleout += '\n'
 	print_to_console(consoleout)
 
-
-# parses the html and prints the verse to console
+# parses the html verse string and prints the verse to console
 def parseAndPrintHtml(string):
 	parser = bibleParser()
 	startPrinting = False
@@ -204,7 +206,7 @@ def parseAndPrintHtml(string):
 				parse_verse(data)
 				break
 
-# parses the html and prints the footnotes to console
+# parses the html footnote string and prints the footnotes to console
 def parseAndPrintFootnotes(string):
 	parser = bibleParser()
 	startPrinting = False
