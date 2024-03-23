@@ -160,7 +160,7 @@ def print_to_console(string):
 
 # cleans up a list of strings with html markers and prints to console
 def parse_verse(htmllist):
-	consoleout = ''
+	consoleout = '\n'
 	skip = 0 # number of entries to skip
 	for i in range(0,len(htmllist)):
 		string = htmllist[i]
@@ -171,10 +171,10 @@ def parse_verse(htmllist):
 			skip = 2
 			continue
 		if(string == "]"):
-			string = string + " "
-		# if((i < len(htmllist) - 1) and ("\xa0" in htmllist[i+1])):
-		# 	consoleout += string + "\n"
-		# 	continue
+			if i < len(htmllist):
+				string1 = htmllist[i+1]
+				if string1[0] != ' ':
+					string = string + " "
 		if(string == "Read full chapter"):
 			break
 		consoleout += string
@@ -215,6 +215,17 @@ def addChapterNewlines(string):
 				string[i] = '\n\n' + line0 + '\n\n'
 	return string
 
+# reformats the text to ensure that footnotes are properly spaced
+def fixFootnoteSpacing(string):
+	for i in range(len(string)-1):
+		line0 = string[i]
+		line1 = string[i+1]
+		if ('[' in line1) and (line0 != ' '): # add spacing before footnote
+			string[i] = line0 + ' '
+		if line0 == '  ': # change double space to one space
+			string[i] = ' '
+	return string
+
 # parses the html verse string and prints the verse to console
 def parseAndPrintHtml(string):
 	parser = bibleParser()
@@ -233,6 +244,7 @@ def parseAndPrintHtml(string):
 				continue
 			else:
 				data=addChapterNewlines(data)
+				data=fixFootnoteSpacing(data)
 				parse_verse(data)
 				break
 
