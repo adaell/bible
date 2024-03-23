@@ -204,26 +204,58 @@ def parse_footnotes(footnotes):
 	print_to_console(consoleout)
 
 # parses a list of strings and adds newline characters after chapter titles
-def addChapterNewlines(string):
-	for i in range(len(string)-1):
-		line0 = string[i]
-		line1 = string[i+1]
-		if ('\xa0' in line1) and (line0 != ' '):
-			if i == 1: # Special case
-				string[i] = '\n' + line0 + '\n\n'
-			else:
-				string[i] = '\n\n' + line0 + '\n\n'
-	return string
+# def addChapterNewlines(string):
+# 	for i in range(len(string)-1):
+# 		line0 = string[i]
+# 		line1 = string[i+1]
+# 		if ('\xa0' in line1) and (line0 != ' '):
+# 			if line1.count('\xa0') == 1:
+# 				if i == 1: # Special case
+# 					string[i] = '\n' + line0 + '\n\n'
+# 				else:
+# 					string[i] = '\n\n' + line0 + '\n\n'
+# 			if line1.count('\xa0') > 1:
+# 				string[i] = '\xa0'
+# 	return string
 
-# reformats the text to ensure that footnotes are properly spaced
-def fixFootnoteSpacing(string):
+# # reformats the text to ensure that footnotes are properly spaced
+# def fixFootnoteSpacing(string):
+# 	for i in range(len(string)-1):
+# 		line0 = string[i]
+# 		line1 = string[i+1]
+# 		if ('[' in line1) and (line0 != ' '): # add spacing before footnote
+# 			string[i] = line0 + ' '
+# 		if line0 == '  ': # change double space to one space
+# 			string[i] = ' '
+# 	return string
+
+def fixFormating(string):
+	import re
 	for i in range(len(string)-1):
 		line0 = string[i]
 		line1 = string[i+1]
-		if ('[' in line1) and (line0 != ' '): # add spacing before footnote
-			string[i] = line0 + ' '
-		if line0 == '  ': # change double space to one space
-			string[i] = ' '
+
+		# Make sure chapter headings appear on a separate line
+		if i >= 1:
+			linen1 = string[i-1]
+			if linen1 == ' ' and line0 != ' ' and '\xa0' in line1: 
+				if i == 1: # special case
+					string[i] = string[i] + '\n\n'
+				else:
+					string[i] = '\n\n' + string[i] + '\n\n'
+
+		# Change \xa0 to spaces
+		if ('\xa0' in line0):
+			count = string[i].count('\xa0')
+			string[i]=re.sub('\xa0',' ',string[i])
+			if count > 1:
+				string[i] = '\n' + string[i]
+			continue
+
+		# Make sure that footnotes have whitespace before them
+		if line1 == '[' and line0[-1] != ' ':
+			string[i+1] = ' ['
+
 	return string
 
 # parses the html verse string and prints the verse to console
@@ -243,8 +275,9 @@ def parseAndPrintHtml(string):
 			if len(data) == 0:
 				continue
 			else:
-				data=addChapterNewlines(data)
-				data=fixFootnoteSpacing(data)
+				# data=addChapterNewlines(data)
+				# data=fixFootnoteSpacing(data)
+				data=fixFormating(data)
 				parse_verse(data)
 				break
 	if startPrinting is False:
