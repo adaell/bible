@@ -247,6 +247,9 @@ def parseAndPrintHtml(string):
 				data=fixFootnoteSpacing(data)
 				parse_verse(data)
 				break
+	if startPrinting is False:
+		print("\nI could not locate this verse.")
+		sys.exit(1)
 
 # parses the html footnote string and prints the footnotes to console
 def parseAndPrintFootnotes(string):
