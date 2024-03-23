@@ -43,7 +43,7 @@ def parseInput():
 		if arg in TRANSLATION_LIST:
 			verse.translation = arg
 			continue
-		# User has specified chapter and verse e.g. 5:6-7 or 5:6
+		# User has specified chapter and verse e.g. Joshua 5:6-7 or Joshua  5:6
 		if ':' in arg:
 			chap_verse_info = arg.split(":")
 			verse.chapter = int(chap_verse_info[0])
@@ -56,10 +56,21 @@ def parseInput():
 			else:
 				verse.verse = int(chap_verse_info[1])
 			continue
-		# User has specified a chapter number on its own
-		if arg.isdigit() is True:
+		# User has specifed the verse numbers separately to the chapter number e.g. Exodus 5 7-8
+		if '-' in arg:
+			chap_verse_info = arg.split("-")
+			verse.verse = [int(chap_verse_info[0]),int(chap_verse_info[1])]
+			if(verse.verse[0] > verse.verse[1]):
+				print("The first verse is larger than the second")
+				sys.exit(1)
+		# User has specified a chapter number and/or verse number on its own e.g. Gen 5 6
+		if arg.isdigit() is True and verse.chapter is None:
 			verse.chapter = int(arg)
 			continue
+		if arg.isdigit() is True and verse.chapter is not None:
+			verse.verse = int(arg)
+			continue
+		continue
 
 	sanity_check(verse)
 	return verse
@@ -123,7 +134,9 @@ class bibleParser(HTMLParser):
 
 # Prints the bible chapter and verse to the console
 def print_title(bibleverse):
-	if isinstance(bibleverse.verse,int) is False:
+	if bibleverse.verse == [None,None]:
+		string = '\n' + bibleverse.book + " " + str(bibleverse.chapter)
+	elif isinstance(bibleverse.verse,int) is False:
 		string = '\n' + bibleverse.book + " " + str(bibleverse.chapter) + ":" + str(bibleverse.verse[0]) + "-" + str(bibleverse.verse[1])
 	else:
 		string = '\n' + bibleverse.book + " " + str(bibleverse.chapter) + ":" + str(bibleverse.verse)
@@ -132,7 +145,8 @@ def print_title(bibleverse):
 # adds carriage returns to string every OUTPUT_WIDTH characters
 def print_to_console(string):
 	counter = 0
-	newstring = '\n'
+	# newstring = '\n'
+	newstring = ''
 	for c in string:
 		counter+=1
 		newstring+=c
@@ -158,6 +172,9 @@ def parse_verse(htmllist):
 			continue
 		if(string == "]"):
 			string = string + " "
+		# if((i < len(htmllist) - 1) and ("\xa0" in htmllist[i+1])):
+		# 	consoleout += string + "\n"
+		# 	continue
 		if(string == "Read full chapter"):
 			break
 		consoleout += string
@@ -165,7 +182,7 @@ def parse_verse(htmllist):
 
 # cleans up a string with footnotes information and prints them to console
 def parse_footnotes(footnotes):
-	consoleout = ''
+	consoleout = '\n'
 	# loop over footnotes
 	for i in range(0,len(footnotes)):
 		fn = footnotes[i]
@@ -186,6 +203,18 @@ def parse_footnotes(footnotes):
 		consoleout += '\n'
 	print_to_console(consoleout)
 
+# parses a list of strings and adds newline characters after chapter titles
+def addChapterNewlines(string):
+	for i in range(len(string)-1):
+		line0 = string[i]
+		line1 = string[i+1]
+		if ('\xa0' in line1) and (line0 != ' '):
+			if i == 1: # Special case
+				string[i] = '\n' + line0 + '\n\n'
+			else:
+				string[i] = '\n\n' + line0 + '\n\n'
+	return string
+
 # parses the html verse string and prints the verse to console
 def parseAndPrintHtml(string):
 	parser = bibleParser()
@@ -203,6 +232,7 @@ def parseAndPrintHtml(string):
 			if len(data) == 0:
 				continue
 			else:
+				data=addChapterNewlines(data)
 				parse_verse(data)
 				break
 
