@@ -167,7 +167,12 @@ def parse_footnotes(footnotes):
 	for i in range(0,len(footnotes)):
 		fn = footnotes[i]
 		skip = True
-		consoleout += '[' + chr(ord('a')+i) + ']'
+		if i < 26:
+			consoleout += '[' + chr(ord('a')+i) + ']'
+		else:
+			rem = i % 26
+			div = int(i / 26)
+			consoleout += '[' + chr(ord('a')+div-1) + chr(ord('a')+rem) + ']'
 		for j in range(0,len(fn)):
 			if fn[j] == 'Footnotes':
 				continue

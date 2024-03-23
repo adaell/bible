@@ -1,3 +1,5 @@
 #!/bin/bash
 
-python3 bible.py $@
+# python3 /usr/local/bin/bible.py $@
+
+python3 `pwd`/bible.py $@
