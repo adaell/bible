@@ -5,12 +5,13 @@ import sys
 # 
 DEFAULT_TRANSLATION = 'LEB'
 OUTPUT_WIDTH=80 # Width of console output
-
+COLOURED_OUTPUT=True
 
 BIBLEBOOKS=['Genesis','Exodus','Leviticus','Numbers','Deuteronomy','Joshua','Judges','Ruth','1Samuel','2Samuel','1Kings','2Kings','1Chronicles','2Chronicles','Ezra','Nehemiah','Esther','Job','Psalms','Proverbs','Ecclesiastes','SongOfSolomon','Isaiah','Jeremiah','Lamentations','Ezekiel','Daniel','Hosea','Joel','Amos','Obadiah','Jonah','Micah','Nahum','Habakkuk','Zephaniah','Haggai','Zechariah','Malachi','Tobit','Judith','WisdomOfSolomon','Sirach','Baruch','LetterOfJeremiah','Susanna','BelAndTheDragon','1Maccabees','2Maccabees','1Esdras','3Maccabees','2Esdras','4Maccabees','Psalms','Matthew','Mark','Luke','John','Acts','Romans','1Corinthians','2Corinthians','Galatians','Ephesians','Philippians','Colossians','1Thessalonians','2Thessalonians','1Timothy','2Timothy','Titus','Philemon','Hebrews','James','1Peter','2Peter','1John','2John','3John','Jude','Revelation']
-BIBLEBOOKS_ABV=['Gen','Exod','Lev','Num','Deut','Josh','Judg','Rth','1Sam','2Sam','1Kgs','2Kgs','1Chron','2Chron','Ezr','Neh','Esth','Jb','Ps','Prov','Ecc','Song','Isa','Jer','Lam','Ezek','Dan','Hos','Joe','Am','Obad','Jnh','Micah','Nah','Hab','Zeph','Hag','Zech','Mal','Tobit','Jdth','Wisd','Sir','Bar','Letter','Sus','Bel','1Macc','2Macc','1Esdr','3Macc','2Esdr','4Macc','Ps','Laod','Matt','Mrk','Luk','John','Act','Rom','1Cor','2Cor','Gal','Ephes','Phil','Col','1Thess','2Thess','1Tim','2Tim','Titus','Philem','Heb','James','1Pet','2Pet','1John','2John','3John','Jude','Rev']
+BIBLEBOOKS_ABV=['Gen','Exod','Lev','Num','Deut','Josh','Judg','Rth','1Sam','2Sam','1Kgs','2Kgs','1Chron','2Chron','Ezr','Neh','Esth','Jb','Ps','Prov','Ecc','Song','Isa','Jer','Lam','Ezek','Dan','Hos','Joe','Am','Obad','Jnh','Micah','Nah','Hab','Zeph','Hag','Zech','Mal','Tobit','Jdth','Wisd','Sir','Bar','Letter','Sus','Bel','1Macc','2Macc','1Esdr','3Macc','2Esdr','4Macc','Ps','Laod','Matt','Mrk','Luk','John','Act','Rom','1Cor','2Cor','Gal','Ephes','Phil','Col','1Thess','2Thess','1Tim','2Tim','Titus','Philem','Heb','James','1Pet','2Pet','1Jhn','2Jhn','3Jhn','Jude','Rev']
 TRANSLATION_LIST=['KJ21','ASV','AMP','AMPC','BRG','CSB','CEB','CJB','CEV','DARBY','DLNT','DRA','ERV','EASY','EHV','ESV','ESVUK','EXB','GNV','GW','GNT','HCSB','ICB','ISV','PHILLIPS','JUB','KJV','AKJV','LSB','LEB','TLB','MSG','MEV','MOUNCE','NOG','NABRE','NASB','NASB1995','NCB','NCV','NET Bible','NIRV','NIV','NIVUK','NKJV','NLV','NLT','NMB','NRSVA','NRSVACE','NRSVCE','NRSVUE','NTFE','OJB','RGT','RSV','RSVCE','TLV','VOICE','WEB','WE','WYC','YLT']
 NUMBERED_BOOKS=['Samuel','Kings','Chronicles','Corinthians','Thessalonians','Timothy','Peter','John']
+NUMBERED_BOOKS_ABV=['Sam','Kgs','Chron','Cor','Thess','Tim','Pet','Jhn']
 
 # a class for storing bible verse information
 class bibleverse:
@@ -27,6 +28,7 @@ def parseInput():
 	lBIBLEBOOKS = [x.lower() for x in BIBLEBOOKS]
 	lBIBLEBOOKS_ABV = [x.lower() for x in BIBLEBOOKS_ABV]
 	lNUMBERED_BOOKS = [x.lower() for x in NUMBERED_BOOKS]
+	lNUMBERED_BOOKS_ABV = [x.lower() for x in NUMBERED_BOOKS_ABV]
 
 	# modifies the verse heading for numbered books
 	args = sys.argv
@@ -38,17 +40,24 @@ def parseInput():
 				args[i+1] = line0+line1
 				del args[i]
 				break
+				# TODO
+			# if line1.lower() in lNUMBERED_BOOKS_ABV:
+			# 	line1 = NUMBERED_BOOKS_ABV[lNUMBERED_BOOKS_ABV.index(line1.lower())]
+			# 	args[i+1] = line0+line1
+			# 	del args[i]
+			# 	break
 
 	# Parses the input
 	verse = bibleverse()
 	for i in range(1,len(args)):
 		arg = args[i]
 		if arg.lower() in lBIBLEBOOKS:
-			verse.book = BIBLEBOOKS[lBIBLEBOOKS.index(arg.lower())]
+			idx = lBIBLEBOOKS.index(arg.lower())
+			verse.book = BIBLEBOOKS[idx]
 			continue
 		if arg.lower() in lBIBLEBOOKS_ABV:
-			verse_index = BIBLEBOOKS_ABV.index(arg)
-			verse.book = BIBLEBOOKS[verse_index]
+			idx = lBIBLEBOOKS_ABV.index(arg)
+			verse.book = BIBLEBOOKS[idx]
 			continue
 		if arg in TRANSLATION_LIST:
 			verse.translation = arg
@@ -158,6 +167,7 @@ def print_title(bibleverse):
 	print(string)
 
 # adds carriage returns to string every OUTPUT_WIDTH characters
+# then prints string to console
 def print_to_console(string):
 	counter = 0
 	# newstring = '\n'
@@ -211,6 +221,7 @@ def parse_footnotes(footnotes):
 			div = int(i / 26)
 			consoleout += '[' + chr(ord('a')+div-1) + chr(ord('a')+rem) + ']'
 
+		# TODO
 		# # Italics
 		# for j in range(0,len(fn)):
 		# 	if 'Literally' == fn[j][0:9]:
@@ -257,11 +268,36 @@ def fixFormating(string):
 			string[i]=re.sub('\xa0',' ',string[i])
 			if count > 1:
 				string[i] = '\n' + string[i]
-			continue
+			# continue
 
 		# Make sure that footnotes have whitespace before them
 		if line1 == '[' and line0[-1] != ' ':
 			string[i+1] = ' ['
+
+		# TODO
+		# Change footnote marks and numbers to grey
+		if COLOURED_OUTPUT is True:
+			GREY='\033[1;30m'
+			NORMAL='\033[0m'
+			if i >= 1:
+				linen1 = string[i-1]
+				if linen1 == ' [' and line1 == ']':
+					string[i-1] = GREY + ' [' + NORMAL
+					string[i] = GREY + string[i] + NORMAL
+					string[i+1] = GREY + ']' + NORMAL
+				# TODO
+				# if linen1 == '[' and line1 == ']':
+				# 	# re.sub('Literally','\x1B[3mLiterally\x1B[0m',fn[j])
+				# 	string[i-1] = GREY + ' [' + NORMAL
+				# 	string[i] = GREY + string[i] + NORMAL
+				# 	string[i+1] = GREY + ']' + NORMAL
+			if line0[0].isdigit() is True:
+				string[i] = GREY + string[i] + NORMAL
+
+		# TODO
+		# # if an entry starts with ' ', delete it
+		# if line0[0] == ' ':
+		# 	string[0] = string[1:]
 
 	# delete the first entry (which is always ' ')
 	string.pop(0)
