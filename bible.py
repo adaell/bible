@@ -10,6 +10,7 @@ OUTPUT_WIDTH=80 # Width of console output
 BIBLEBOOKS=['Genesis','Exodus','Leviticus','Numbers','Deuteronomy','Joshua','Judges','Ruth','1Samuel','2Samuel','1Kings','2Kings','1Chronicles','2Chronicles','Ezra','Nehemiah','Esther','Job','Psalms','Proverbs','Ecclesiastes','SongOfSolomon','Isaiah','Jeremiah','Lamentations','Ezekiel','Daniel','Hosea','Joel','Amos','Obadiah','Jonah','Micah','Nahum','Habakkuk','Zephaniah','Haggai','Zechariah','Malachi','Tobit','Judith','WisdomOfSolomon','Sirach','Baruch','LetterOfJeremiah','Susanna','BelAndTheDragon','1Maccabees','2Maccabees','1Esdras','3Maccabees','2Esdras','4Maccabees','Psalms','Matthew','Mark','Luke','John','Acts','Romans','1Corinthians','2Corinthians','Galatians','Ephesians','Philippians','Colossians','1Thessalonians','2Thessalonians','1Timothy','2Timothy','Titus','Philemon','Hebrews','James','1Peter','2Peter','1John','2John','3John','Jude','Revelation']
 BIBLEBOOKS_ABV=['Gen','Exod','Lev','Num','Deut','Josh','Judg','Rth','1Sam','2Sam','1Kgs','2Kgs','1Chron','2Chron','Ezr','Neh','Esth','Jb','Ps','Prov','Ecc','Song','Isa','Jer','Lam','Ezek','Dan','Hos','Joe','Am','Obad','Jnh','Micah','Nah','Hab','Zeph','Hag','Zech','Mal','Tobit','Jdth','Wisd','Sir','Bar','Letter','Sus','Bel','1Macc','2Macc','1Esdr','3Macc','2Esdr','4Macc','Ps','Laod','Matt','Mrk','Luk','John','Act','Rom','1Cor','2Cor','Gal','Ephes','Phil','Col','1Thess','2Thess','1Tim','2Tim','Titus','Philem','Heb','James','1Pet','2Pet','1John','2John','3John','Jude','Rev']
 TRANSLATION_LIST=['KJ21','ASV','AMP','AMPC','BRG','CSB','CEB','CJB','CEV','DARBY','DLNT','DRA','ERV','EASY','EHV','ESV','ESVUK','EXB','GNV','GW','GNT','HCSB','ICB','ISV','PHILLIPS','JUB','KJV','AKJV','LSB','LEB','TLB','MSG','MEV','MOUNCE','NOG','NABRE','NASB','NASB1995','NCB','NCV','NET Bible','NIRV','NIV','NIVUK','NKJV','NLV','NLT','NMB','NRSVA','NRSVACE','NRSVCE','NRSVUE','NTFE','OJB','RGT','RSV','RSVCE','TLV','VOICE','WEB','WE','WYC','YLT']
+NUMBERED_BOOKS=['Samuel','Kings','Chronicles','Corinthians','Thessalonians','Timothy','Peter','John']
 
 # a class for storing bible verse information
 class bibleverse:
@@ -23,16 +24,25 @@ class bibleverse:
 def parseInput():
 	import sys
 
-	# # wrong number of arguments
-	# if len(sys.argv) > 3:
-	# 	print("Invalid number of arguments. Was expecting two (Chapter Verse). Try `bible Genesis 2:3-4`")
-	# 	exit(1)
 	lBIBLEBOOKS = [x.lower() for x in BIBLEBOOKS]
 	lBIBLEBOOKS_ABV = [x.lower() for x in BIBLEBOOKS_ABV]
+	lNUMBERED_BOOKS = [x.lower() for x in NUMBERED_BOOKS]
 
+	# modifies the verse heading
+	args = sys.argv
+	for i in range(1,len(args)-1):
+		line0 = args[i]
+		line1 = args[i+1]
+		if line0.isdigit() is True and line1.isdigit() is False:
+			if line1.lower() in lNUMBERED_BOOKS:
+				args[i+1] = line0+line1
+				del args[i]
+				break
+
+	# Parses the input
 	verse = bibleverse()
-	for i in range(1,len(sys.argv)):
-		arg = sys.argv[i]
+	for i in range(1,len(args)):
+		arg = args[i]
 		if arg.lower() in lBIBLEBOOKS:
 			verse.book = BIBLEBOOKS[lBIBLEBOOKS.index(arg.lower())]
 			continue
@@ -77,10 +87,10 @@ def parseInput():
 
 def sanity_check(bibleverse):
 	if bibleverse.chapter == None:
-		print("I do not understand what chapter you want.")
+		print("\nI do not understand what chapter you want.\n")
 		sys.exit(1)
 	if bibleverse.book == None:
-		print("I do not understand which book you want")
+		print("\nI do not understand which book you want.\n")
 		sys.exit(1)
 
 # Takes a bibleverse and returns a url to the verse on biblegateway
@@ -134,12 +144,17 @@ class bibleParser(HTMLParser):
 
 # Prints the bible chapter and verse to the console
 def print_title(bibleverse):
-	if bibleverse.verse == [None,None]:
-		string = '\n' + bibleverse.book + " " + str(bibleverse.chapter)
-	elif isinstance(bibleverse.verse,int) is False:
-		string = '\n' + bibleverse.book + " " + str(bibleverse.chapter) + ":" + str(bibleverse.verse[0]) + "-" + str(bibleverse.verse[1])
+	if bibleverse.book[0].isdigit() is True:
+		titlestring = bibleverse.book[0] + ' ' + bibleverse.book[1:]
 	else:
-		string = '\n' + bibleverse.book + " " + str(bibleverse.chapter) + ":" + str(bibleverse.verse)
+		titlestring = bibleverse.book
+
+	if bibleverse.verse == [None,None]:
+		string = '\n' + titlestring + " " + str(bibleverse.chapter)
+	elif isinstance(bibleverse.verse,int) is False:
+		string = '\n' + titlestring + " " + str(bibleverse.chapter) + ":" + str(bibleverse.verse[0]) + "-" + str(bibleverse.verse[1])
+	else:
+		string = '\n' + titlestring + " " + str(bibleverse.chapter) + ":" + str(bibleverse.verse)
 	print(string)
 
 # adds carriage returns to string every OUTPUT_WIDTH characters
