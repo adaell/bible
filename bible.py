@@ -28,7 +28,7 @@ def parseInput():
 	lBIBLEBOOKS_ABV = [x.lower() for x in BIBLEBOOKS_ABV]
 	lNUMBERED_BOOKS = [x.lower() for x in NUMBERED_BOOKS]
 
-	# modifies the verse heading
+	# modifies the verse heading for numbered books
 	args = sys.argv
 	for i in range(1,len(args)-1):
 		line0 = args[i]
@@ -197,17 +197,34 @@ def parse_verse(htmllist):
 
 # cleans up a string with footnotes information and prints them to console
 def parse_footnotes(footnotes):
+	import re
 	consoleout = '\n'
 	# loop over footnotes
 	for i in range(0,len(footnotes)):
 		fn = footnotes[i]
 		skip = True
+		# Footnote numbering/lettering
 		if i < 26:
 			consoleout += '[' + chr(ord('a')+i) + ']'
 		else:
 			rem = i % 26
 			div = int(i / 26)
 			consoleout += '[' + chr(ord('a')+div-1) + chr(ord('a')+rem) + ']'
+
+		# # Italics
+		# for j in range(0,len(fn)):
+		# 	if 'Literally' == fn[j][0:9]:
+		# 		fn[j]=re.sub('Literally','\x1B[3mLiterally\x1B[0m',fn[j])
+		# 		continue
+		# 	if 'Hebrew' == fn[j][0:6]:
+		# 		fn[j]=re.sub('Hebrew','\x1B[3mHebrew\x1B[0m',fn[j])	
+		# 		continue
+		# 	fn[j]=re.sub('Lit','\x1B[3mLit\x1B[0m',fn[j])
+		# 	fn[j]=re.sub('Heb','\x1B[3mHeb\x1B[0m',fn[j])
+		# 	fn[j]=re.sub('I.e.','\x1B[3mI.e.\x1B[0m',fn[j])
+		# 	fn[j]=re.sub('Or','\x1B[3mOr\x1B[0m',fn[j])
+
+		# Add to consoleout
 		for j in range(0,len(fn)):
 			if fn[j] == 'Footnotes':
 				continue
@@ -218,7 +235,7 @@ def parse_footnotes(footnotes):
 		consoleout += '\n'
 	print_to_console(consoleout)
 
-# makes some cosmetic changes to the html string 
+# makes some cosmetic changes to the output string 
 def fixFormating(string):
 	import re
 	for i in range(len(string)-1):
@@ -246,6 +263,8 @@ def fixFormating(string):
 		if line1 == '[' and line0[-1] != ' ':
 			string[i+1] = ' ['
 
+	# delete the first entry (which is always ' ')
+	string.pop(0)
 	return string
 
 # parses the html verse string and prints the verse to console
@@ -265,8 +284,6 @@ def parseAndPrintHtml(string):
 			if len(data) == 0:
 				continue
 			else:
-				# data=addChapterNewlines(data)
-				# data=fixFootnoteSpacing(data)
 				data=fixFormating(data)
 				parse_verse(data)
 				break
