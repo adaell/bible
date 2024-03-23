@@ -14,4 +14,4 @@ bible Exodus 4 ESV
 bible Exodus 4 3
 bible 1 John 3
 bible 1 Samuel 3 KJV
-bible 1 Samuel
+bible 1Samuel 2 3-5
