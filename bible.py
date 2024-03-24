@@ -3,7 +3,7 @@ import urllib.request
 import sys
 
 # 
-DEFAULT_TRANSLATION = 'ESV'
+DEFAULT_TRANSLATION = 'LEB'
 OUTPUT_WIDTH=80 # Width of console output. Set to 0 to disable wrapping
 COLOURED_OUTPUT=True
 
@@ -12,6 +12,9 @@ BIBLEBOOKS_ABV=['Gen','Exod','Lev','Num','Deut','Josh','Judg','Rth','1Sam','2Sam
 TRANSLATION_LIST=['KJ21','ASV','AMP','AMPC','BRG','CSB','CEB','CJB','CEV','DARBY','DLNT','DRA','ERV','EASY','EHV','ESV','ESVUK','EXB','GNV','GW','GNT','HCSB','ICB','ISV','PHILLIPS','JUB','KJV','AKJV','LSB','LEB','TLB','MSG','MEV','MOUNCE','NOG','NABRE','NASB','NASB1995','NCB','NCV','NET Bible','NIRV','NIV','NIVUK','NKJV','NLV','NLT','NMB','NRSVA','NRSVACE','NRSVCE','NRSVUE','NTFE','OJB','RGT','RSV','RSVCE','TLV','VOICE','WEB','WE','WYC','YLT']
 NUMBERED_BOOKS=['Samuel','Kings','Chronicles','Corinthians','Thessalonians','Timothy','Peter','John']
 NUMBERED_BOOKS_ABV=['Sam','Kgs','Chron','Cor','Thess','Tim','Pet','Jhn']
+
+GREY='\033[1;30m'
+NORMAL='\033[0m'
 
 # a class for storing bible verse information
 class bibleverse:
@@ -29,6 +32,7 @@ def parseInput():
 	lBIBLEBOOKS_ABV = [x.lower() for x in BIBLEBOOKS_ABV]
 	lNUMBERED_BOOKS = [x.lower() for x in NUMBERED_BOOKS]
 	lNUMBERED_BOOKS_ABV = [x.lower() for x in NUMBERED_BOOKS_ABV]
+	lTRANSLATION_LIST = [x.lower() for x in TRANSLATION_LIST]
 
 	# modifies the verse heading for numbered books
 	args = sys.argv
@@ -53,7 +57,7 @@ def parseInput():
 			idx = lBIBLEBOOKS_ABV.index(arg)
 			verse.book = BIBLEBOOKS[idx]
 			continue
-		if arg in TRANSLATION_LIST:
+		if arg.lower() in lTRANSLATION_LIST:
 			verse.translation = arg
 			continue
 		# User has specified chapter and verse e.g. Joshua 5:6-7 or Joshua  5:6
@@ -167,8 +171,15 @@ def print_to_console(string):
 		counter = 0
 		# newstring = '\n'
 		newstring = ''
+		escape = False
 		for c in string:
-			counter+=1
+			if c == '\x1b':
+				escape = True
+			if escape is True and c == 'm':
+				escape = False
+			if escape is False:
+				counter+=1
+
 			newstring+=c
 			if c == "\n": # if we just started a new line, reset the counter
 				counter=0
@@ -182,30 +193,31 @@ def print_to_console(string):
 
 # cleans up a list of strings with html markers and prints to console
 def parse_verse(htmllist):
-	consoleout = '\n'
-	skip = 0 # number of entries to skip
-	for i in range(0,len(htmllist)):
-		string = htmllist[i]
-		if skip > 0:
-			skip = skip - 1
-			continue
-		if(string == "("):
-			skip = 2
-			continue
-		if(string == "]"):
-			if i < len(htmllist):
-				string1 = htmllist[i+1]
-				if string1[0] != ' ':
-					string = string + " "
-		if(string == "Read full chapter"):
-			break
-		consoleout += string
-	print_to_console(consoleout)
+	# consoleout = '\n'
+	# skip = 0 # number of entries to skip
+	# for i in range(0,len(htmllist)):
+	# 	string = htmllist[i]
+	# 	if skip > 0:
+	# 		skip = skip - 1
+	# 		continue
+	# 	if(string == "("):
+	# 		skip = 2
+	# 		continue
+	# 	if(string == "]"):
+	# 		if i < len(htmllist):
+	# 			string1 = htmllist[i+1]
+	# 			if string1[0] != ' ':
+	# 				string = string + " "
+	# 	if(string == "Read full chapter"):
+	# 		break
+	# 	consoleout += string
+	# print_to_console(consoleout)
+	print_to_console(htmllist)
 
 # cleans up a string with footnotes information and prints them to console
 def parse_footnotes(footnotes):
 	import re
-	consoleout = '\n'
+	consoleout = '\n' + GREY
 	# loop over footnotes
 	for i in range(0,len(footnotes)):
 		fn = footnotes[i]
@@ -245,11 +257,8 @@ def parse_footnotes(footnotes):
 
 # makes some cosmetic changes to the output string 
 def fixFormating(string):
-	GREY='\033[1;30m'
-	NORMAL='\033[0m'
-
 	import re
-	newstring = ''
+	newstring = '\n'
 	skip = 0
 	
 	for i in range(1,len(string)-1):
@@ -275,7 +284,7 @@ def fixFormating(string):
 			newstring += GREY + ' ['
 			continue
 		if sentence == ']':
-			newstring += ']' + NORMAL + '\010'
+			newstring += ']' + NORMAL
 			continue
 		if sentence[0].isdigit() is True:
 			number = ''
