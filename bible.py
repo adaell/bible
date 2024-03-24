@@ -3,8 +3,8 @@ import urllib.request
 import sys
 
 # 
-DEFAULT_TRANSLATION = 'LEB'
-OUTPUT_WIDTH=80 # Width of console output
+DEFAULT_TRANSLATION = 'ESV'
+OUTPUT_WIDTH=80 # Width of console output. Set to 0 to disable wrapping
 COLOURED_OUTPUT=True
 
 BIBLEBOOKS=['Genesis','Exodus','Leviticus','Numbers','Deuteronomy','Joshua','Judges','Ruth','1Samuel','2Samuel','1Kings','2Kings','1Chronicles','2Chronicles','Ezra','Nehemiah','Esther','Job','Psalms','Proverbs','Ecclesiastes','SongOfSolomon','Isaiah','Jeremiah','Lamentations','Ezekiel','Daniel','Hosea','Joel','Amos','Obadiah','Jonah','Micah','Nahum','Habakkuk','Zephaniah','Haggai','Zechariah','Malachi','Tobit','Judith','WisdomOfSolomon','Sirach','Baruch','LetterOfJeremiah','Susanna','BelAndTheDragon','1Maccabees','2Maccabees','1Esdras','3Maccabees','2Esdras','4Maccabees','Psalms','Matthew','Mark','Luke','John','Acts','Romans','1Corinthians','2Corinthians','Galatians','Ephesians','Philippians','Colossians','1Thessalonians','2Thessalonians','1Timothy','2Timothy','Titus','Philemon','Hebrews','James','1Peter','2Peter','1John','2John','3John','Jude','Revelation']
@@ -40,12 +40,6 @@ def parseInput():
 				args[i+1] = line0+line1
 				del args[i]
 				break
-				# TODO
-			# if line1.lower() in lNUMBERED_BOOKS_ABV:
-			# 	line1 = NUMBERED_BOOKS_ABV[lNUMBERED_BOOKS_ABV.index(line1.lower())]
-			# 	args[i+1] = line0+line1
-			# 	del args[i]
-			# 	break
 
 	# Parses the input
 	verse = bibleverse()
@@ -169,19 +163,22 @@ def print_title(bibleverse):
 # adds carriage returns to string every OUTPUT_WIDTH characters
 # then prints string to console
 def print_to_console(string):
-	counter = 0
-	# newstring = '\n'
-	newstring = ''
-	for c in string:
-		counter+=1
-		newstring+=c
-		if c == "\n": # if we just started a new line, reset the counter
-			counter=0
-		if counter >= OUTPUT_WIDTH: 
-			if c == " ":
-				newstring+='\n'
-				counter = 0
-	print(newstring)
+	if OUTPUT_WIDTH != 0:
+		counter = 0
+		# newstring = '\n'
+		newstring = ''
+		for c in string:
+			counter+=1
+			newstring+=c
+			if c == "\n": # if we just started a new line, reset the counter
+				counter=0
+			if counter >= OUTPUT_WIDTH: 
+				if c == " ":
+					newstring+='\n'
+					counter = 0
+		print(newstring)
+	else:
+		print(string)
 
 # cleans up a list of strings with html markers and prints to console
 def parse_verse(htmllist):
@@ -248,60 +245,61 @@ def parse_footnotes(footnotes):
 
 # makes some cosmetic changes to the output string 
 def fixFormating(string):
+	GREY='\033[1;30m'
+	NORMAL='\033[0m'
+
 	import re
-	for i in range(len(string)-1):
-		line0 = string[i]
-		line1 = string[i+1]
+	newstring = ''
+	skip = 0
+	
+	for i in range(1,len(string)-1):
+		if skip > 0: # skip some lines
+			skip -= 1
+			continue
+		sentence = string[i]
 
-		# Make sure chapter headings appear on a separate line
-		if i >= 1:
-			linen1 = string[i-1]
-			if linen1 == ' ' and line0 != ' ' and '\xa0' in line1: 
-				if i == 1: # special case
-					string[i] = string[i] + '\n\n'
-				else:
-					string[i] = '\n\n' + string[i] + '\n\n'
+		# Put newline before and after chapter headings
+		sentenceN1 = string[i-1]
+		sentenceP1 = string[i+1]
+		if sentenceN1 == ' ' and sentence != ' ' and '\xa0' in sentenceP1:
+			if i > 1:
+				newstring += '\n\n'
+			sentence = sentence + '\n\n'
 
-		# Change \xa0 to spaces
-		if ('\xa0' in line0):
-			count = string[i].count('\xa0')
-			string[i]=re.sub('\xa0',' ',string[i])
-			if count > 1:
-				string[i] = '\n' + string[i]
-			# continue
+		#skip these letters
+		if sentence == '(':
+			skip = 2
+			continue
 
-		# Make sure that footnotes have whitespace before them
-		if line1 == '[' and line0[-1] != ' ':
-			string[i+1] = ' ['
+		if sentence == '[':
+			newstring += GREY + ' ['
+			continue
+		if sentence == ']':
+			newstring += ']' + NORMAL + '\010'
+			continue
+		if sentence[0].isdigit() is True:
+			number = ''
+			for c in sentence:
+				if c.isdigit() is False:
+					break
+				number += c
+			newstring += GREY + number + ' ' + NORMAL
+			continue
 
-		# TODO
-		# Change footnote marks and numbers to grey
-		if COLOURED_OUTPUT is True:
-			GREY='\033[1;30m'
-			NORMAL='\033[0m'
-			if i >= 1:
-				linen1 = string[i-1]
-				if linen1 == ' [' and line1 == ']':
-					string[i-1] = GREY + ' [' + NORMAL
-					string[i] = GREY + string[i] + NORMAL
-					string[i+1] = GREY + ']' + NORMAL
-				# TODO
-				# if linen1 == '[' and line1 == ']':
-				# 	# re.sub('Literally','\x1B[3mLiterally\x1B[0m',fn[j])
-				# 	string[i-1] = GREY + ' [' + NORMAL
-				# 	string[i] = GREY + string[i] + NORMAL
-				# 	string[i+1] = GREY + ']' + NORMAL
-			if line0[0].isdigit() is True:
-				string[i] = GREY + string[i] + NORMAL
+		# if '\xa0' in sentenceP1 and sentenceP1[0].isdigit() is False:
+		# 	newstring = newstring + '\n' + sentenceP1 + sentence
+		# 	continue
+		# if '\xa0' in sentence and sentence[0].isdigit() is False:
+		# 	newstring = newstring + '\n' + sentence 
+		# 	continue
+		if '\xa0' in sentence and sentence[0].isdigit() is False:
+			sentence = ' '
 
-		# TODO
-		# # if an entry starts with ' ', delete it
-		# if line0[0] == ' ':
-		# 	string[0] = string[1:]
+		if sentence == 'Read full chapter':
+			break
+		newstring += sentence
 
-	# delete the first entry (which is always ' ')
-	string.pop(0)
-	return string
+	return newstring
 
 # parses the html verse string and prints the verse to console
 def parseAndPrintHtml(string):
