@@ -1,7 +1,7 @@
 alpha i.e. probably has many unknown bugs
 
 # bible
-Looks up a bible verse from biblegateway.com and then
+Looks up a bible verse on biblegateway.com and then
 prints it to the console. Uses the ESV by default.
 
 Usage:
