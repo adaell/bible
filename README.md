@@ -1,4 +1,4 @@
-pre-alpha release
+alpha i.e. probably has many unknown bugs
 
 # bible
 Looks up a bible verse from biblegateway.com and then
