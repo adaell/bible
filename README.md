@@ -1,8 +1,8 @@
 pre-alpha release
 
 # bible
-Fetches a bible verse from biblegateway.com and 
-prints it to the console.
+Looks up a bible verse from biblegateway.com and then
+prints it to the console. Uses the ESV by default.
 
 Usage:
 
