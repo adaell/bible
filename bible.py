@@ -3,7 +3,7 @@ import urllib.request
 import sys
 
 # 
-DEFAULT_TRANSLATION = 'LEB'
+DEFAULT_TRANSLATION = 'ESV'
 OUTPUT_WIDTH=80 # Width of console output. Set to 0 to disable wrapping
 COLOURED_OUTPUT=True
 
