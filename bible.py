@@ -191,29 +191,6 @@ def print_to_console(string):
 	else:
 		print(string)
 
-# cleans up a list of strings with html markers and prints to console
-def parse_verse(htmllist):
-	# consoleout = '\n'
-	# skip = 0 # number of entries to skip
-	# for i in range(0,len(htmllist)):
-	# 	string = htmllist[i]
-	# 	if skip > 0:
-	# 		skip = skip - 1
-	# 		continue
-	# 	if(string == "("):
-	# 		skip = 2
-	# 		continue
-	# 	if(string == "]"):
-	# 		if i < len(htmllist):
-	# 			string1 = htmllist[i+1]
-	# 			if string1[0] != ' ':
-	# 				string = string + " "
-	# 	if(string == "Read full chapter"):
-	# 		break
-	# 	consoleout += string
-	# print_to_console(consoleout)
-	print_to_console(htmllist)
-
 # cleans up a string with footnotes information and prints them to console
 def parse_footnotes(footnotes):
 	import re
@@ -252,7 +229,8 @@ def parse_footnotes(footnotes):
 				skip = False
 				continue
 			consoleout += fn[j]
-		consoleout += '\n'
+		consoleout += '\n' 
+	consoleout += NORMAL
 	print_to_console(consoleout)
 
 # makes some cosmetic changes to the output string 
@@ -295,12 +273,6 @@ def fixFormating(string):
 			newstring += GREY + number + ' ' + NORMAL
 			continue
 
-		# if '\xa0' in sentenceP1 and sentenceP1[0].isdigit() is False:
-		# 	newstring = newstring + '\n' + sentenceP1 + sentence
-		# 	continue
-		# if '\xa0' in sentence and sentence[0].isdigit() is False:
-		# 	newstring = newstring + '\n' + sentence 
-		# 	continue
 		if '\xa0' in sentence and sentence[0].isdigit() is False:
 			sentence = ' '
 
@@ -328,7 +300,7 @@ def parseAndPrintHtml(string):
 				continue
 			else:
 				data=fixFormating(data)
-				parse_verse(data)
+				print_to_console(data)
 				break
 	if startPrinting is False:
 		print("\nI could not locate this verse.\n")
