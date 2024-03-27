@@ -180,10 +180,10 @@ def print_to_console(string):
 		for c in string:
 			if c == '\x1b':
 				escape = True
-			if escape is True and c == 'm':
-				escape = False
 			if escape is False:
 				counter+=1
+			if escape is True and c == 'm':
+				escape = False
 
 			newstring+=c
 			if c == "\n": # if we just started a new line, reset the counter
@@ -198,6 +198,10 @@ def print_to_console(string):
 
 # cleans up a string with footnotes information and prints them to console
 def parse_footnotes(footnotes):
+	if len(footnotes) == 0:
+		print()
+		sys.exit(0)
+
 	import re
 	consoleout = '\n' + GREY
 	# loop over footnotes
